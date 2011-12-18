@@ -9,7 +9,7 @@
 
 
 /* Maximum number of select-list items or bind variables. */
-#define ORALIB_MAX_ITEMS         40
+#define ORALIB_MAX_ITEMS         120
 /* Maximum SQL statement size */
 #define ORALIB_MAX_SQL_SIZE	  	(4*KBYTE)
 

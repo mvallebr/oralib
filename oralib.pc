@@ -1,0 +1,668 @@
+/*******************************************************************
+lib oralib - feita a partir do metodo PRO*C 
+"Dynamic SQL Method 4"
+*******************************************************************/
+
+#include <oralib.h>
+#include <stdio.h>
+#include <string.h>
+#include <setjmp.h>
+#include <sqlda.h>
+#include <stdlib.h>
+#include <sqlcpr.h>
+
+char *dml_commands[] = {"SELECT", "select", "INSERT", "insert",
+                        "UPDATE", "update", "DELETE", "delete"};
+
+EXEC SQL INCLUDE sqlda;
+EXEC SQL INCLUDE sqlca;
+
+EXEC SQL DECLARE DBASE DATABASE;
+
+
+typedef struct _OLOracleInfo {
+	sql_context ctx; 
+	SQLDA *bind_dp;
+	SQLDA *select_dp;
+	/* A global flag for the error routine. */
+	int parse_flag;
+	char    dyn_statement[ORALIB_MAX_SQL_SIZE];
+} OLOracleInfo;
+
+OL *oralib_new(void){
+	return (OL *) malloc(sizeof(OL));
+}
+
+void oralib_destroy(OL *db){
+	free(db);
+}
+
+int oralib_init(OL *db, char *username, char *password, char *database) {
+	EXEC SQL BEGIN DECLARE SECTION;
+        char 	uname[128];
+        char 	pword[32];
+		char  	dbase[128];
+		sql_context ctx; 
+    EXEC SQL END DECLARE SECTION;
+
+    EXEC SQL WHENEVER SQLERROR GOTO connect_error;
+
+	EXEC SQL ENABLE THREADS; 
+	
+	/* Allocate thread context */
+	db->oracle_info = malloc(sizeof(OLOracleInfo));
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	EXEC SQL CONTEXT ALLOCATE :ctx;
+	EXEC SQL CONTEXT USE :ctx;
+	info->ctx = ctx;
+	info->parse_flag = 0;
+	
+	strcpy(uname, username);
+	strcpy(pword, password);
+	strcpy(dbase, database);
+    EXEC SQL CONNECT :uname IDENTIFIED BY :pword AT DBASE USING :dbase;
+	
+	/* Allocate memory for the oracle select and bind descriptors. */
+	return oralib_alloc_descriptors(db, ORALIB_MAX_ITEMS, ORALIB_MAX_VNAME_LEN, ORALIB_MAX_INAME_LEN);
+
+connect_error:	
+    sprintf(db->last_error, "Cannot connect to ORACLE database '%s' as user '%s'/'%s'. SQL CA Error code: %d\n", database, username, password, sqlca.sqlcode);
+    return ORALIB_ERROR;	
+}
+
+void oralib_finish(OL *db) {
+	int i;
+	EXEC SQL BEGIN DECLARE SECTION;
+	sql_context ctx; 
+	EXEC SQL END DECLARE SECTION;
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	ctx = info->ctx;
+	EXEC SQL CONTEXT USE :ctx;
+	
+    /* When done, free the memory allocated for
+       pointers in the bind and select descriptors. */
+    for (i = 0; i < ORALIB_MAX_ITEMS; i++)
+    {    
+        if (info->bind_dp->V[i] != (char *) 0)
+            free(info->bind_dp->V[i]);
+        free(info->bind_dp->I[i]);   /* MAX_ITEMS were allocated. */
+        if (info->select_dp->V[i] != (char *) 0)
+            free(info->select_dp->V[i]);
+        free(info->select_dp->I[i]); /* MAX_ITEMS were allocated. */
+    }
+
+    /* Free space used by the descriptors themselves. */
+	
+    sqlclu(info->bind_dp);
+	sqlclu(info->select_dp);
+	
+	if (db->oracle_info!=NULL){
+		free(db->oracle_info);
+		db->oracle_info = NULL;
+	}
+		
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    
+    EXEC SQL AT DBASE COMMIT WORK RELEASE;
+    
+	EXEC SQL CONTEXT FREE :ctx;    
+}
+
+
+
+/*
+ *  Allocate the BIND and SELECT descriptors using sqlald().
+ *  Also allocate the pointers to indicator variables
+ *  in each descriptor.  The pointers to the actual bind
+ *  variables and the select-list items are realloc'ed in
+ *  the set_bind_variables() or process_select_list()
+ *  routines.  This routine allocates 1 byte for info->select_dp->V[i]
+ *  and info->bind_dp->V[i], so the realloc will work correctly.
+ */
+
+int oralib_alloc_descriptors(OL *db, int size, int max_vname_len, int max_iname_len){
+    int i;
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	
+    /*
+     * The first sqlald parameter determines the maximum number of
+     * array elements in each variable in the descriptor. In
+     * other words, it determines the maximum number of bind
+     * variables or select-list items in the SQL statement.
+     *
+     * The second parameter determines the maximum length of
+     * strings used to hold the names of select-list items
+     * or placeholders.  The maximum length of column 
+     * names in ORACLE is 30, but you can allocate more or less
+     * as needed.
+     *
+     * The third parameter determines the maximum length of
+     * strings used to hold the names of any indicator
+     * variables.  To follow ORACLE standards, the maximum
+     * length of these should be 30.  But, you can allocate
+     * more or less as needed.
+     */
+
+    if ((info->bind_dp =
+            sqlald(size, max_vname_len, max_iname_len)) == (SQLDA *) 0) {
+        sprintf(db->last_error,
+            "Cannot allocate memory for bind descriptor.");
+        return ORALIB_ERROR;  /* Have to exit in this case. */
+    }
+
+    if ((info->select_dp =
+        sqlald (size, max_vname_len, max_iname_len)) == (SQLDA *) 0) {
+        sprintf(db->last_error,
+            "Cannot allocate memory for select descriptor.");
+        return ORALIB_ERROR;
+    }
+    info->select_dp->N = ORALIB_MAX_ITEMS;
+
+    /* Allocate the pointers to the indicator variables, and the
+       actual data. */
+    for (i = 0; i < ORALIB_MAX_ITEMS; i++) {
+        info->bind_dp->I[i] = (short *) malloc(sizeof (short));
+        info->select_dp->I[i] = (short *) malloc(sizeof(short));
+        info->bind_dp->V[i] = (char *) malloc(1);
+        info->select_dp->V[i] = (char *) malloc(1);
+    }
+       
+    return ORALIB_SUCCESS;
+}
+
+int oralib_get_num_binds(OL *db) {
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	return info->bind_dp->F;
+}
+OLField* oralib_get_bind_field(OL *db, int num_bind){	
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	OLField *dbfield = &(db->bindfields[num_bind]);
+	if (info->bind_dp->I[num_bind]==NULL)
+		return NULL;
+	dbfield->name_length	= 	info->bind_dp->C[num_bind];
+	dbfield->name			= 	info->bind_dp->S[num_bind];	
+	dbfield->name[dbfield->name_length] = '\0';
+	dbfield->data_length	= 	info->bind_dp->L[num_bind];
+	dbfield->value			= 	info->bind_dp->V[num_bind];
+	dbfield->type			=	info->bind_dp->T[num_bind];
+	return dbfield;
+}
+
+int oralib_get_numbind_by_name(OL *db, char *name){
+	int i;
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	for (i=0; i<info->bind_dp->F; i++) 
+		if (strcasecmp(name, info->bind_dp->S[i])==0)
+			return i;
+	return -1;
+}
+
+void oralib_set_bind_string(OL *db, char *name, char *value) {
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	int num_bind = oralib_get_numbind_by_name(db, name); 	
+	if (num_bind==-1) {
+		sprintf(db->last_error, "Sorry, could not find bind field named '%s'\n", name);
+		return;
+	}
+	oralib_set_bind_field_value(db, num_bind, value, strlen(value));
+}
+
+void oralib_set_bind_long(OL *db, char *name, long value) {
+	char bind_value[64];
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	int num_bind = oralib_get_numbind_by_name(db, name); 
+	if (num_bind==-1)
+		return;
+	sprintf(bind_value, "%ld", value);
+	oralib_set_bind_string(db, name, bind_value);
+}
+
+void oralib_set_bind_date(OL *db, char *name, char *value) {	
+	oralib_set_bind_string(db, name, value);
+}
+
+void oralib_set_bind_field_value(OL *db, int num_bind, void *value, int length) {
+	OLField *dbfield = &(db->bindfields[num_bind]);	
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	
+	/* Set the indicator variable's value. Is it NULL? */
+	if (value==NULL)
+		*info->bind_dp->I[num_bind] = -1;
+	else
+		*info->bind_dp->I[num_bind] = 0;
+
+	/* Set the bind datatype to 1 for CHAR. */
+	info->bind_dp->T[num_bind] = 1; 
+		
+	/* 
+		(re-)allocate the buffer for the value.
+		sqlald() reserves a pointer location for
+		V[i] but does not allocate the full space for
+		the pointer. 
+	*/
+
+	info->bind_dp->L[num_bind] = length;
+	info->bind_dp->V[num_bind] = (char *) realloc(info->bind_dp->V[num_bind],
+					 (info->bind_dp->L[num_bind] + 1)); 
+	
+	/* And copy it in. */
+    strncpy(info->bind_dp->V[num_bind], value, length);	
+}
+
+int oralib_prepare_statement(OL *db, char *sql){
+	EXEC SQL BEGIN DECLARE SECTION;
+	sql_context ctx; 
+    char    dyn_statement[ORALIB_MAX_SQL_SIZE];
+    EXEC SQL VAR dyn_statement IS STRING(ORALIB_MAX_SQL_SIZE);
+	EXEC SQL END DECLARE SECTION;
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	ctx = info->ctx;
+	EXEC SQL CONTEXT USE :ctx;
+	
+	/* Prepare the statement and declare a cursor. */
+	EXEC SQL WHENEVER SQLERROR GOTO oralib_prepare_statement_error; 
+
+	info->parse_flag = 1;     /* Set a flag for oralib_sql_error(). */
+	strcpy(dyn_statement, sql);
+	EXEC SQL AT DBASE PREPARE S FROM :dyn_statement;
+	info->parse_flag = 0;     /* Unset the flag. */
+
+	EXEC SQL AT DBASE DECLARE C CURSOR FOR S;
+	
+	SQLDA *bind_dp = info->bind_dp;
+	info->bind_dp->N = ORALIB_MAX_ITEMS;  /* Initialize count of array elements. */
+    EXEC SQL AT DBASE DESCRIBE BIND VARIABLES FOR S INTO bind_dp;
+
+    /* If F is negative, there were more bind variables
+       than originally allocated by sqlald(). */
+    if (info->bind_dp->F < 0)
+    {
+        sprintf(db->last_error, "\nToo many bind variables (%d), maximum is %d\n.",
+                    -info->bind_dp->F, ORALIB_MAX_ITEMS);
+        return ORALIB_ERROR;
+    }
+	
+	/* Set the maximum number of array elements in the
+       descriptor to the number found. */
+    info->bind_dp->N = info->bind_dp->F;
+			
+	return ORALIB_SUCCESS;
+	
+oralib_prepare_statement_error:
+	oralib_sql_error(db);
+	return ORALIB_ERROR;	
+}
+
+void oralib_sql_error(OL *db) {
+	EXEC SQL BEGIN DECLARE SECTION;
+	sql_context ctx; 
+	EXEC SQL END DECLARE SECTION;
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	ctx = info->ctx;
+	EXEC SQL CONTEXT USE :ctx;
+	
+    /* ORACLE error handler */
+    sprintf(db->last_error, "\n\nORA ERROR: '%.70s'\n",sqlca.sqlerrm.sqlerrmc);
+    if (info->parse_flag)
+        sprintf(db->last_error, 
+        "%s \n\t- Parse error at character offset %d in SQL statement.\n",
+           db->last_error, sqlca.sqlerrd[4]);
+
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    EXEC SQL AT DBASE ROLLBACK WORK;
+}
+
+int oralib_commit(OL *db) {
+	EXEC SQL BEGIN DECLARE SECTION;
+	sql_context ctx; 
+	EXEC SQL END DECLARE SECTION;
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	ctx = info->ctx;
+	EXEC SQL CONTEXT USE :ctx;
+	
+	EXEC SQL WHENEVER SQLERROR GOTO oralib_commit_error;
+    
+    EXEC SQL AT DBASE COMMIT;
+    
+	/* Close the cursor. */
+    /* EXEC SQL AT DBASE CLOSE C; */
+	
+	return ORALIB_SUCCESS;	
+oralib_commit_error:
+	oralib_sql_error(db);
+	return ORALIB_ERROR;	
+}
+
+int oralib_rollback(OL *db) {
+	EXEC SQL BEGIN DECLARE SECTION;
+	sql_context ctx; 
+	EXEC SQL END DECLARE SECTION;
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	ctx = info->ctx;
+	EXEC SQL CONTEXT USE :ctx;
+	
+	EXEC SQL WHENEVER SQLERROR GOTO oralib_rollback_error;
+    
+    EXEC SQL AT DBASE ROLLBACK;
+	
+	/* Close the cursor. */
+    /* EXEC SQL AT DBASE CLOSE C;  */
+    
+	return ORALIB_SUCCESS;	
+oralib_rollback_error:
+	oralib_sql_error(db);
+	return ORALIB_ERROR;	
+}
+
+
+int oralib_execute(OL *db){
+	int i, null_ok, precision, scale;
+	EXEC SQL BEGIN DECLARE SECTION;
+	sql_context ctx; 
+	EXEC SQL END DECLARE SECTION;
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	ctx = info->ctx;
+	EXEC SQL CONTEXT USE :ctx;
+	
+    /* If the SQL statement is a SELECT, describe the
+        select-list items.  The DESCRIBE function returns
+        their names, datatypes, lengths (including precision
+        and scale), and NULL/NOT NULL statuses. */
+
+	EXEC SQL WHENEVER SQLERROR GOTO oralib_execute_error;
+		
+	/* Open the cursor and execute the statement.
+	 * If the statement is not a query (SELECT), the
+	 * statement processing is completed after the
+	 * OPEN.
+	 */
+
+	SQLDA *bind_dp = info->bind_dp;
+	SQLDA *select_dp = info->select_dp;
+	
+	EXEC SQL AT DBASE OPEN C USING DESCRIPTOR bind_dp;
+	
+    info->select_dp->N = ORALIB_MAX_ITEMS;    
+    EXEC SQL AT DBASE DESCRIBE SELECT LIST FOR S INTO select_dp;
+
+
+    /* If F is negative, there were more select-list
+       items than originally allocated by sqlald(). */
+    if (info->select_dp->F < 0)
+    {
+        sprintf(db->last_error, "\nToo many select-list items (%d), maximum is %d\n",
+                -(info->select_dp->F), ORALIB_MAX_ITEMS);
+        return ORALIB_ERROR;
+    }
+
+    /* Set the maximum number of array elements in the
+       descriptor to the number found. */
+    info->select_dp->N = info->select_dp->F;
+
+    /* Allocate storage for each select-list item.
+  
+       sqlprc() is used to extract precision and scale
+       from the length (info->select_dp->L[i]).
+
+       sqlnul() is used to reset the high-order bit of
+       the datatype and to check whether the column
+       is NOT NULL.
+
+       CHAR    datatypes have length, but zero precision and
+               scale.  The length is defined at CREATE time.
+
+       NUMBER  datatypes have precision and scale only if
+               defined at CREATE time.  If the column
+               definition was just NUMBER, the precision
+               and scale are zero, and you must allocate
+               the required maximum length.
+
+       DATE    datatypes return a length of 7 if the default
+               format is used.  This should be increased to
+               9 to store the actual date character string.
+               If you use the TO_CHAR function, the maximum
+               length could be 75, but will probably be less
+               (you can see the effects of this in SQL*Plus).
+
+       ROWID   datatype always returns a fixed length of 18 if
+               coerced to CHAR.
+
+       LONG and
+       LONG RAW datatypes return a length of 0 (zero),
+               so you need to set a maximum.  In this example,
+               it is 240 characters.
+
+       */
+   
+    for (i = 0; i < info->select_dp->F; i++)
+    {
+        char title[ORALIB_MAX_VNAME_LEN]; 
+		
+        /* Turn off high-order bit of datatype (in this example,
+           it does not matter if the column is NOT NULL). */
+        sqlnul ((unsigned short *)&(info->select_dp->T[i]), (unsigned short *)&(info->select_dp->T[i]), &null_ok);
+
+        switch (info->select_dp->T[i])
+        {
+            case  DB_FTYPE_CHAR: /* CHAR datatype: no change in length
+                         needed, except possibly for TO_CHAR
+                         conversions (not handled here). */
+                break;
+            case  DB_FTYPE_NUMBER: /* NUMBER datatype: use sqlprc() to
+                         extract precision and scale. */
+                sqlprc ((unsigned long *)&(info->select_dp->L[i]), &precision, &scale);
+                      /* Allow for maximum size of NUMBER. */
+                if (precision == 0) precision = 40;
+                      /* Also allow for decimal point and
+                         possible sign. */
+                /* convert NUMBER datatype to FLOAT if scale > 0,
+                   INT otherwise. */				   
+                if (scale > 0)
+                    info->select_dp->L[i] = sizeof(float);
+                else
+                    info->select_dp->L[i] = sizeof(long long);
+                break;
+
+            case  DB_FTYPE_LONG: 
+                info->select_dp->L[i] = 240;
+                break;
+
+            case DB_FTYPE_ROWID: 
+            case DB_FTYPE_UROWID: 
+                info->select_dp->L[i] = 18;
+                break;
+
+            case DB_FTYPE_DATE: 
+                info->select_dp->L[i] = 9;
+                break;
+ 
+            case DB_FTYPE_RAW: 
+                break;
+
+            case DB_FTYPE_LONGRAW: 
+                info->select_dp->L[i] = 240;
+                break;
+        }
+        /* Allocate space for the select-list data values.
+           sqlald() reserves a pointer location for
+           V[i] but does not allocate the full space for
+           the pointer.  */
+
+         if (info->select_dp->T[i] != 2)
+           info->select_dp->V[i] = (char *) realloc(info->select_dp->V[i],
+                                    info->select_dp->L[i] + 1);  
+         else
+           info->select_dp->V[i] = (char *) realloc(info->select_dp->V[i],
+                                    info->select_dp->L[i]);  
+
+        /* Print column headings, right-justifying number
+            column headings. */
+        
+        /* Copy to temporary buffer in case name is null-terminated */
+        memset(title, ' ', ORALIB_MAX_VNAME_LEN);
+        strncpy(title, info->select_dp->S[i], info->select_dp->C[i]);
+        /*
+		if (info->select_dp->T[i] == 2)
+           if (scale > 0)
+             printf ("%.*s ", info->select_dp->L[i]+3, title);
+           else
+             printf ("%.*s ", info->select_dp->L[i], title);
+        else
+          printf("%-.*s ", info->select_dp->L[i], title);
+		*/        
+
+		/* Coerce ALL datatypes except for LONG RAW and NUMBER to
+           character. */
+		int old_type=info->select_dp->T[i];
+        if (info->select_dp->T[i] != DB_FTYPE_LONGRAW && info->select_dp->T[i] != DB_FTYPE_NUMBER)
+            info->select_dp->T[i] = 1;
+			
+        /* Coerce the datatypes of NUMBERs to float or int depending on
+           the scale. */
+        if (info->select_dp->T[i] == DB_FTYPE_NUMBER)
+          if (scale > 0)
+             info->select_dp->T[i] = DB_FTYPE_FLOAT;  
+          else
+			info->select_dp->T[i] = DB_FTYPE_INTEGER;  
+			
+		OLField *dbfield = &(db->selectfields[i]);
+		dbfield->name_length	= 	info->select_dp->C[i];
+		dbfield->name			= 	info->select_dp->S[i];	
+		dbfield->data_length	= 	info->select_dp->L[i];
+		dbfield->value			= 	info->select_dp->V[i];
+		dbfield->type			=	(old_type==DB_FTYPE_DATE) ? old_type : info->select_dp->T[i];
+    }    
+	
+	return ORALIB_SUCCESS;
+
+oralib_execute_error:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+    /* Close the cursor. */
+    EXEC SQL AT DBASE CLOSE C;    
+
+	oralib_sql_error(db);
+	return ORALIB_ERROR;	
+}
+
+int oralib_fetch(OL *db){
+	int i;
+	EXEC SQL BEGIN DECLARE SECTION;
+	sql_context ctx; 
+	EXEC SQL END DECLARE SECTION;
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	ctx = info->ctx;
+	EXEC SQL CONTEXT USE :ctx;
+		
+	/* FETCH each row selected and print the column values. */
+    EXEC SQL WHENEVER NOT FOUND GOTO oralib_fetch_end_select_loop;
+
+	EXEC SQL WHENEVER SQLERROR GOTO oralib_fetch_error;
+	
+	SQLDA *select_dp = info->select_dp;
+	EXEC SQL AT DBASE FETCH C USING DESCRIPTOR select_dp;
+
+	return ORALIB_SUCCESS;
+	
+oralib_fetch_end_select_loop:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+    /* Close the cursor. */
+    EXEC SQL AT DBASE CLOSE C;    
+    
+	return ORALIB_NO_MORE_DATA;
+
+oralib_fetch_error:
+	oralib_sql_error(db);
+	return ORALIB_ERROR;	
+}
+
+int oralib_get_num_fields(OL *db) {
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	return  info->select_dp->F;
+}
+OLField* oralib_get_field(OL *db, int num_field) {	
+	return &(db->selectfields[num_field]);
+}
+
+OLFieldType oralib_get_field_type(OL *db, int num_field) {	
+	return db->selectfields[num_field].type;
+}
+int oralib_get_field_size(OL *db, int num_field) {
+	return db->selectfields[num_field].data_length;
+}
+
+int oralib_is_field_null(OL *db, int num_field) {
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	if (*info->select_dp->I[num_field] < 0)
+		return 1;
+	return 0;
+}
+
+const char *oralib_get_field_value_as_string(OL *db, int num_field) {
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	if (*info->select_dp->I[num_field] < 0)
+		return "[NULL]";
+	return (const char *) db->selectfields[num_field].value;
+}
+
+long long oralib_get_field_value_as_int(OL *db, int num_field) {
+	return *((long long *) db->selectfields[num_field].value);
+}
+
+float oralib_get_field_value_as_float(OL *db, int num_field) {
+	return *((float *) db->selectfields[num_field].value);
+}
+
+int oralib_get_numfield_by_name(OL *db, char *name){
+	int i;
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	for (i=0; i<info->select_dp->F; i++) 
+		if (strcasecmp(name, info->select_dp->S[i])==0)
+			return i;
+	return -1;
+	
+}
+
+const char *oralib_get_field_value_by_name_as_string(OL *db, char *name) {
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	int num_field = oralib_get_numfield_by_name(db, name); 	
+	if (num_field==-1) {
+		sprintf(db->last_error, "Sorry, could not find field named '%s'\n", name);
+		return NULL;
+	}
+	return oralib_get_field_value_as_string(db, num_field);
+}
+
+long long oralib_get_field_value_by_name_as_int(OL *db, char *name) {
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	int num_field = oralib_get_numfield_by_name(db, name); 	
+	if (num_field==-1) {
+		sprintf(db->last_error, "Sorry, could not find field named '%s'\n", name);
+		return 0;
+	}
+	return oralib_get_field_value_as_int(db, num_field);
+}
+
+float oralib_get_field_value_by_name_as_float(OL *db, char *name) {
+	OLOracleInfo *info = (OLOracleInfo *) db->oracle_info;
+	int num_field = oralib_get_numfield_by_name(db, name); 	
+	if (num_field==-1) {
+		sprintf(db->last_error, "Sorry, could not find field named '%s'\n", name);
+		return 0.0;
+	}
+	return oralib_get_field_value_as_float(db, num_field);
+}
+
+void oralib_set_last_error(OL *db, char *error) {
+	strncpy(db->last_error, error, MAX_ERROR_SIZE);
+	db->last_error[MAX_ERROR_SIZE-1]='\0';
+}
+
+const char *oralib_get_last_error(OL *db) {
+	return (const char *) db->last_error;
+}
+
+
+
+
+
+

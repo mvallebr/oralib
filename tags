@@ -1,0 +1,244 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+BASE_PATH	../src/makefile	/^BASE_PATH=..$/;"	m
+BIN	../src/makefile	/^BIN=lib$(LIBNAME).sl$/;"	m
+BIN_PATH	../src/makefile	/^BIN_PATH=$(BASE_PATH)\/bin$/;"	m
+BIN_TEST	../src/makefile	/^BIN_TEST=sccdb_test$/;"	m
+C	../src/makefile	/^C=$/;"	m
+C	../src/scclib_db.c	/^  \/* ub2*   *\/ short     *C; \/* Ptr to Arr of current lengths of var. names *\/$/;"	m	struct:SQLDA	file:
+CC	../src/makefile	/^CC=cc$/;"	m
+CFLAGS_ALL	../src/makefile	/^CFLAGS_ALL=+z -g -Wall -AC99 $(ORACLE_FLAGS) $/;"	m
+C_TEST	../src/makefile	/^C_TEST=test.c$/;"	m
+DB_FTYPE_CHAR	../src/scclib_db.h	/^	DB_FTYPE_CHAR=1, 		\/* CHAR datatype *\/$/;"	e	enum:__anon1
+DB_FTYPE_DATE	../src/scclib_db.h	/^	DB_FTYPE_DATE=12,		\/* DATE datatype *\/$/;"	e	enum:__anon1
+DB_FTYPE_FLOAT	../src/scclib_db.h	/^	DB_FTYPE_FLOAT=4,		\/* float *\/$/;"	e	enum:__anon1
+DB_FTYPE_INTEGER	../src/scclib_db.h	/^	DB_FTYPE_INTEGER=3,		\/* long long int , 8 bytes long *\/$/;"	e	enum:__anon1
+DB_FTYPE_LONG	../src/scclib_db.h	/^	DB_FTYPE_LONG=8, 		\/* LONG datatype *\/$/;"	e	enum:__anon1
+DB_FTYPE_LONGRAW	../src/scclib_db.h	/^	DB_FTYPE_LONGRAW=24,	\/* LONG RAW datatype *\/$/;"	e	enum:__anon1
+DB_FTYPE_NUMBER	../src/scclib_db.h	/^	DB_FTYPE_NUMBER=2, 		\/* NUMBER datatype, internal oracle representation *\/$/;"	e	enum:__anon1
+DB_FTYPE_RAW	../src/scclib_db.h	/^	DB_FTYPE_RAW=23,		\/* RAW datatype *\/$/;"	e	enum:__anon1
+DB_FTYPE_ROWID	../src/scclib_db.h	/^	DB_FTYPE_ROWID=11, 		\/* ROWID datatype *\/$/;"	e	enum:__anon1
+DB_FTYPE_UNKNOWN	../src/scclib_db.h	/^	DB_FTYPE_UNKNOWN=-1$/;"	e	enum:__anon1
+DB_FTYPE_UROWID	../src/scclib_db.h	/^	DB_FTYPE_UROWID=104, 	\/* Universal ROWID datatype *\/$/;"	e	enum:__anon1
+DEBUG	../src/scclib_db.h	28;"	d
+F	../src/scclib_db.c	/^  \/* sb4    *\/ int        F; \/* Number of variables found by DESCRIBE       *\/$/;"	m	struct:SQLDA	file:
+F	../src/scclib_db.c	220;"	d	file:
+F	../src/scclib_db.c	412;"	d	file:
+I	../src/scclib_db.c	/^  \/* sb2**  *\/ short    **I; \/* Ptr to Arr of addresses of indicator vars   *\/$/;"	m	struct:SQLDA	file:
+IAPFAIL	../src/scclib_db.c	/^static const int IAPFAIL = 1403;$/;"	v	file:
+IAPFTL	../src/scclib_db.c	/^static const int IAPFTL  = 535;$/;"	v	file:
+IAPSUCC	../src/scclib_db.c	/^static const int IAPSUCC = 0;$/;"	v	file:
+KBYTE	../src/scclib_db.h	4;"	d
+L	../src/scclib_db.c	/^  \/* ub4*   *\/ int       *L; \/* Ptr to Arr of lengths of buffers            *\/$/;"	m	struct:SQLDA	file:
+L	../src/scclib_db.c	227;"	d	file:
+L	../src/scclib_db.c	419;"	d	file:
+LDFLAGS_LIB	../src/makefile	/^LDFLAGS_LIB=-b $(ORACLE_LIBS)  $/;"	m
+LDFLAGS_TEST	../src/makefile	/^LDFLAGS_TEST=$(ORACLE_LIBS) -L$(BIN_PATH) -l$(LIBNAME)$/;"	m
+LIBNAME	../src/makefile	/^LIBNAME=scclib_db$/;"	m
+M	../src/scclib_db.c	/^  \/* ub2*   *\/ short     *M; \/* Ptr to Arr of max lengths of var. names     *\/$/;"	m	struct:SQLDA	file:
+MAX_ERROR_SIZE	../src/scclib_db.h	17;"	d
+N	../src/scclib_db.c	/^  \/* ub4    *\/ int        N; \/* Descriptor size in number of entries        *\/$/;"	m	struct:SQLDA	file:
+NULL	../src/scclib_db.h	25;"	d
+OBJS	../src/makefile	/^OBJS= ${SRC:.c=.o} ${C:.c=.o}$/;"	m
+OBJS_TEST	../src/makefile	/^OBJS_TEST= ${SRC_TEST:.c=.o} ${C_TEST:.c=.o}$/;"	m
+ORACLE_FLAGS	../src/makefile	/^ORACLE_FLAGS=$(CFLAGS64)$/;"	m
+ORACLE_LIBS	../src/makefile	/^ORACLE_LIBS= -Wl,+k -Wl,+s -Wl,+n +DA2.0W +DS2.0 -L\/tools\/oracle\/11.1.0\/precomp\/lib\/ -L\/tools\/oracle\/11.1.0\/lib\/ -Wl,-a,default -lsql11 `cat $(ORACLE_HOME)\/lib\/ldflags` -locijdbc11$/;"	m
+PC	../src/makefile	/^PC=scclib_db.pc$/;"	m
+PC_TEST	../src/makefile	/^PC_TEST=$/;"	m
+PRINT_DEBUG	../src/scclib_db.h	30;"	d
+PRINT_DEBUG	../src/scclib_db.h	32;"	d
+PROCFLAGS	../src/makefile	/^PROCFLAGS=ORACA=YES THREADS=YES include=. MODE=ANSI DYNAMIC=ANSI TYPE_CODE=ANSI CODE=ANSI_C CLOSE_ON_COMMIT=YES $/;"	m
+PROC_EXEC	../src/makefile	/^PROC_EXEC= $(PROC_64)$/;"	m
+S	../src/scclib_db.c	/^  \/* text** *\/ char     **S; \/* Ptr to Arr of variable name pointers        *\/$/;"	m	struct:SQLDA	file:
+S	../src/scclib_db.c	224;"	d	file:
+S	../src/scclib_db.c	416;"	d	file:
+SCCLIB_DB_ERROR	../src/scclib_db.h	7;"	d
+SCCLIB_DB_H_	../src/scclib_db.h	2;"	d
+SCCLIB_DB_MAX_INAME_LEN	../src/scclib_db.h	22;"	d
+SCCLIB_DB_MAX_ITEMS	../src/scclib_db.h	12;"	d
+SCCLIB_DB_MAX_SQL_SIZE	../src/scclib_db.h	14;"	d
+SCCLIB_DB_MAX_VNAME_LEN	../src/scclib_db.h	21;"	d
+SCCLIB_DB_NO_MORE_DATA	../src/scclib_db.h	8;"	d
+SCCLIB_DB_SUCCESS	../src/scclib_db.h	6;"	d
+SQLCA	../src/scclib_db.c	321;"	d	file:
+SQLCA	../src/scclib_db.c	512;"	d	file:
+SQLDA	../src/scclib_db.c	/^struct SQLDA {$/;"	s	file:
+SQLDA	../src/scclib_db.c	/^typedef struct SQLDA SQLDA;$/;"	t	typeref:struct:SQLDA	file:
+SQLDA_	../src/scclib_db.c	214;"	d	file:
+SQLDA_	../src/scclib_db.c	406;"	d	file:
+SQLSQLDAAlloc	../src/scclib_db.c	257;"	d	file:
+SQLSQLDAAlloc	../src/scclib_db.c	449;"	d	file:
+SQLSQLDAFree	../src/scclib_db.c	259;"	d	file:
+SQLSQLDAFree	../src/scclib_db.c	451;"	d	file:
+SQL_CONTEXT	../src/scclib_db.c	/^typedef void * SQL_CONTEXT;$/;"	t	file:
+SQL_CRSR	../src/scclib_db.c	4;"	d	file:
+SQL_CURSOR	../src/scclib_db.c	/^  typedef struct sql_cursor SQL_CURSOR;$/;"	t	typeref:struct:sql_cursor	file:
+SRC	../src/makefile	/^SRC= ${PC:.pc=.c}$/;"	m
+SRC_TEST	../src/makefile	/^SRC_TEST= ${PC_TEST:.pc=.c}$/;"	m
+SccDb	../src/scclib_db.h	/^} SccDb;$/;"	t	typeref:struct:_SccDb
+SccDbField	../src/scclib_db.h	/^} SccDbField;$/;"	t	typeref:struct:_SccDbField
+SccDbFieldType	../src/scclib_db.h	/^}SccDbFieldType;$/;"	t	typeref:enum:__anon1
+SccDbOracleInfo	../src/scclib_db.c	/^} SccDbOracleInfo;$/;"	t	typeref:struct:_SccDbOracleInfo	file:
+T	../src/scclib_db.c	/^  \/* sb2*   *\/ short     *T; \/* Ptr to Arr of types of buffers              *\/$/;"	m	struct:SQLDA	file:
+T	../src/scclib_db.c	217;"	d	file:
+T	../src/scclib_db.c	409;"	d	file:
+V	../src/scclib_db.c	/^  \/* text** *\/ char     **V; \/* Ptr to Arr of addresses of main variables   *\/$/;"	m	struct:SQLDA	file:
+VARCHAR	../src/scclib_db.c	/^typedef struct { unsigned short len; unsigned char arr[1]; } VARCHAR;$/;"	t	typeref:struct:__anon2	file:
+X	../src/scclib_db.c	/^  \/* text** *\/ char     **X; \/* Ptr to Arr of ind. var. name pointers       *\/$/;"	m	struct:SQLDA	file:
+Y	../src/scclib_db.c	/^  \/* ub2*   *\/ short     *Y; \/* Ptr to Arr of max lengths of ind. var. names*\/$/;"	m	struct:SQLDA	file:
+Y	../src/scclib_db.c	231;"	d	file:
+Y	../src/scclib_db.c	423;"	d	file:
+Z	../src/scclib_db.c	/^  \/* ub2*   *\/ short     *Z; \/* Ptr to Arr of cur lengths of ind. var. names*\/$/;"	m	struct:SQLDA	file:
+_SccDb	../src/scclib_db.h	/^typedef struct _SccDb {$/;"	s
+_SccDbField	../src/scclib_db.h	/^typedef struct _SccDbField {	$/;"	s
+_SccDbOracleInfo	../src/scclib_db.c	/^typedef struct _SccDbOracleInfo {$/;"	s	file:
+adtmode	../src/scclib_db.c	/^  unsigned short adtmode; $/;"	m	struct:sqladts	file:
+adtnum	../src/scclib_db.c	/^  unsigned short adtnum;  $/;"	m	struct:sqladts	file:
+adttvn	../src/scclib_db.c	/^  sqltvn adttvn[1];       $/;"	m	struct:sqladts	file:
+adtvsn	../src/scclib_db.c	/^  unsigned int adtvsn; $/;"	m	struct:sqladts	file:
+arr	../src/scclib_db.c	/^typedef struct { unsigned short len; unsigned char arr[1]; } VARCHAR;$/;"	m	struct:__anon2	file:
+arr	../src/scclib_db.c	/^typedef struct { unsigned short len; unsigned char arr[1]; } varchar;$/;"	m	struct:__anon3	file:
+arrsiz	../src/scclib_db.c	/^   unsigned int   arrsiz;$/;"	m	struct:sqlexd	file:
+bind_dp	../src/scclib_db.c	/^	SQLDA *bind_dp;$/;"	m	struct:_SccDbOracleInfo	file:
+bindfields	../src/scclib_db.h	/^	SccDbField bindfields	[SCCLIB_DB_MAX_ITEMS];$/;"	m	struct:_SccDb
+ctx	../src/scclib_db.c	/^	sql_context ctx; $/;"	m	struct:_SccDbOracleInfo	file:
+cud	../src/scclib_db.c	/^      const short *cud;$/;"	m	struct:sqlexd	file:
+curocn	../src/scclib_db.c	/^    unsigned int curocn;$/;"	m	struct:sql_cursor	file:
+data_length	../src/scclib_db.h	/^	int data_length;$/;"	m	struct:_SccDbField
+dml_commands	../src/scclib_db.c	/^char *dml_commands[] = {"SELECT", "select", "INSERT", "insert",$/;"	v
+dyn_statement	../src/scclib_db.c	/^	char    dyn_statement[SCCLIB_DB_MAX_SQL_SIZE];$/;"	m	struct:_SccDbOracleInfo	file:
+dyn_statement	../src/test.c	/^char    dyn_statement[SCCLIB_DB_MAX_SQL_SIZE];$/;"	v
+exec_cmd	../src/scc.sh	/^exec_cmd() {$/;"	f
+fillen	../src/scclib_db.c	/^  unsigned short fillen;$/;"	m	struct:sqlcxp	file:
+filnam	../src/scclib_db.c	/^           char  filnam[13];$/;"	m	struct:sqlcxp	file:
+get_dyn_statement	../src/test.c	/^int get_dyn_statement()$/;"	f
+help	../src/test.c	/^void help()$/;"	f
+iters	../src/scclib_db.c	/^   unsigned int   iters;$/;"	m	struct:sqlexd	file:
+last_error	../src/scclib_db.h	/^	char last_error		[MAX_ERROR_SIZE];$/;"	m	struct:_SccDb
+len	../src/scclib_db.c	/^typedef struct { unsigned short len; unsigned char arr[1]; } VARCHAR;$/;"	m	struct:__anon2	file:
+len	../src/scclib_db.c	/^typedef struct { unsigned short len; unsigned char arr[1]; } varchar;$/;"	m	struct:__anon3	file:
+magic	../src/scclib_db.c	/^    unsigned int magic;$/;"	m	struct:sql_cursor	file:
+main	../src/test.c	/^int main() {$/;"	f
+name	../src/scclib_db.h	/^	char *name;$/;"	m	struct:_SccDbField
+name_length	../src/scclib_db.h	/^	int name_length;$/;"	m	struct:_SccDbField
+occurs	../src/scclib_db.c	/^   unsigned int   occurs;$/;"	m	struct:sqlexd	file:
+offset	../src/scclib_db.c	/^   unsigned int   offset;$/;"	m	struct:sqlexd	file:
+oracle_info	../src/scclib_db.h	/^	void *oracle_info;$/;"	m	struct:_SccDb
+parse_flag	../src/scclib_db.c	/^	int parse_flag;$/;"	m	struct:_SccDbOracleInfo	file:
+ptr1	../src/scclib_db.c	/^    void *ptr1;$/;"	m	struct:sql_cursor	file:
+ptr2	../src/scclib_db.c	/^    void *ptr2;$/;"	m	struct:sql_cursor	file:
+scclib_db_alloc_descriptors	../src/scclib_db.c	/^int scclib_db_alloc_descriptors(SccDb *db, int size, int max_vname_len, int max_iname_len){$/;"	f
+scclib_db_commit	../src/scclib_db.c	/^int scclib_db_commit(SccDb *db) {$/;"	f
+scclib_db_destroy	../src/scclib_db.c	/^void scclib_db_destroy(SccDb *db){$/;"	f
+scclib_db_execute	../src/scclib_db.c	/^int scclib_db_execute(SccDb *db){$/;"	f
+scclib_db_fetch	../src/scclib_db.c	/^int scclib_db_fetch(SccDb *db){$/;"	f
+scclib_db_finish	../src/scclib_db.c	/^void scclib_db_finish(SccDb *db) {$/;"	f
+scclib_db_get_bind_field	../src/scclib_db.c	/^SccDbField* scclib_db_get_bind_field(SccDb *db, int num_bind){	$/;"	f
+scclib_db_get_field	../src/scclib_db.c	/^SccDbField* scclib_db_get_field(SccDb *db, int num_field) {	$/;"	f
+scclib_db_get_field_size	../src/scclib_db.c	/^int scclib_db_get_field_size(SccDb *db, int num_field) {$/;"	f
+scclib_db_get_field_type	../src/scclib_db.c	/^SccDbFieldType scclib_db_get_field_type(SccDb *db, int num_field) {	$/;"	f
+scclib_db_get_field_value_as_float	../src/scclib_db.c	/^float scclib_db_get_field_value_as_float(SccDb *db, int num_field) {$/;"	f
+scclib_db_get_field_value_as_int	../src/scclib_db.c	/^long long scclib_db_get_field_value_as_int(SccDb *db, int num_field) {$/;"	f
+scclib_db_get_field_value_as_string	../src/scclib_db.c	/^const char *scclib_db_get_field_value_as_string(SccDb *db, int num_field) {$/;"	f
+scclib_db_get_field_value_by_name_as_float	../src/scclib_db.c	/^float scclib_db_get_field_value_by_name_as_float(SccDb *db, char *name) {$/;"	f
+scclib_db_get_field_value_by_name_as_int	../src/scclib_db.c	/^long long scclib_db_get_field_value_by_name_as_int(SccDb *db, char *name) {$/;"	f
+scclib_db_get_field_value_by_name_as_string	../src/scclib_db.c	/^const char *scclib_db_get_field_value_by_name_as_string(SccDb *db, char *name) {$/;"	f
+scclib_db_get_last_error	../src/scclib_db.c	/^const char *scclib_db_get_last_error(SccDb *db) {$/;"	f
+scclib_db_get_num_binds	../src/scclib_db.c	/^int scclib_db_get_num_binds(SccDb *db) {$/;"	f
+scclib_db_get_num_fields	../src/scclib_db.c	/^int scclib_db_get_num_fields(SccDb *db) {$/;"	f
+scclib_db_get_numbind_by_name	../src/scclib_db.c	/^int scclib_db_get_numbind_by_name(SccDb *db, char *name){$/;"	f
+scclib_db_get_numfield_by_name	../src/scclib_db.c	/^int scclib_db_get_numfield_by_name(SccDb *db, char *name){$/;"	f
+scclib_db_init	../src/scclib_db.c	/^int scclib_db_init(SccDb *db, char *username, char *password, char *database) {$/;"	f
+scclib_db_is_field_null	../src/scclib_db.c	/^int scclib_db_is_field_null(SccDb *db, int num_field) {$/;"	f
+scclib_db_new	../src/scclib_db.c	/^SccDb *scclib_db_new(void){$/;"	f
+scclib_db_prepare_statement	../src/scclib_db.c	/^int scclib_db_prepare_statement(SccDb *db, char *sql){$/;"	f
+scclib_db_rollback	../src/scclib_db.c	/^int scclib_db_rollback(SccDb *db) {$/;"	f
+scclib_db_set_bind_date	../src/scclib_db.c	/^void scclib_db_set_bind_date(SccDb *db, char *name, char *value) {	$/;"	f
+scclib_db_set_bind_field_value	../src/scclib_db.c	/^void scclib_db_set_bind_field_value(SccDb *db, int num_bind, void *value, int length) {$/;"	f
+scclib_db_set_bind_long	../src/scclib_db.c	/^void scclib_db_set_bind_long(SccDb *db, char *name, long value) {$/;"	f
+scclib_db_set_bind_string	../src/scclib_db.c	/^void scclib_db_set_bind_string(SccDb *db, char *name, char *value) {$/;"	f
+scclib_db_set_last_error	../src/scclib_db.c	/^void scclib_db_set_last_error(SccDb *db, char *error) {$/;"	f
+scclib_db_sql_error	../src/scclib_db.c	/^void scclib_db_sql_error(SccDb *db) {$/;"	f
+select_dp	../src/scclib_db.c	/^	SQLDA *select_dp;$/;"	m	struct:_SccDbOracleInfo	file:
+selectfields	../src/scclib_db.h	/^	SccDbField selectfields	[SCCLIB_DB_MAX_ITEMS];$/;"	m	struct:_SccDb
+selerr	../src/scclib_db.c	/^   unsigned short selerr;$/;"	m	struct:sqlexd	file:
+sqadto	../src/scclib_db.c	/^   unsigned short  sqadto[4];$/;"	m	struct:sqlexd	file:
+sqcmod	../src/scclib_db.c	/^   unsigned int   sqcmod;$/;"	m	struct:sqlexd	file:
+sqfmod	../src/scclib_db.c	/^   unsigned int   sqfmod;$/;"	m	struct:sqlexd	file:
+sqfoff	../src/scclib_db.c	/^            int   sqfoff;$/;"	m	struct:sqlexd	file:
+sqharc	../src/scclib_db.c	/^   unsigned long  *sqharc[4];$/;"	m	struct:sqlexd	file:
+sqharm	../src/scclib_db.c	/^   unsigned long  sqharm[4];$/;"	m	struct:sqlexd	file:
+sqhstl	../src/scclib_db.c	/^   unsigned long  sqhstl[4];$/;"	m	struct:sqlexd	file:
+sqhsts	../src/scclib_db.c	/^            int   sqhsts[4];$/;"	m	struct:sqlexd	file:
+sqhstv	../src/scclib_db.c	/^   unsigned char  *sqhstv[4];$/;"	m	struct:sqlexd	file:
+sqinds	../src/scclib_db.c	/^            int   sqinds[4];$/;"	m	struct:sqlexd	file:
+sqindv	../src/scclib_db.c	/^            short *sqindv[4];$/;"	m	struct:sqlexd	file:
+sql_context	../src/scclib_db.c	/^typedef void * sql_context;$/;"	t	file:
+sql_cursor	../src/scclib_db.c	/^  struct sql_cursor$/;"	s	file:
+sql_cursor	../src/scclib_db.c	/^  typedef struct sql_cursor sql_cursor;$/;"	t	typeref:struct:sql_cursor	file:
+sqlabc	../src/scclib_db.c	/^         \/* b4  *\/ int     sqlabc;$/;"	m	struct:sqlca	file:
+sqladt	../src/scclib_db.c	/^static struct sqladts sqladt = {$/;"	v	typeref:struct:sqladts	file:
+sqladtp	../src/scclib_db.c	/^   sqladts *sqladtp;$/;"	m	struct:sqlexd	file:
+sqladts	../src/scclib_db.c	/^struct sqladts$/;"	s	file:
+sqladts	../src/scclib_db.c	/^typedef struct sqladts sqladts;$/;"	t	typeref:struct:sqladts	file:
+sqlca	../src/scclib_db.c	/^SQLCA_STORAGE_CLASS struct sqlca sqlca$/;"	v	typeref:struct:sqlca
+sqlca	../src/scclib_db.c	/^struct   sqlca$/;"	s	file:
+sqlcaid	../src/scclib_db.c	/^         \/* ub1 *\/ char    sqlcaid[8];$/;"	m	struct:sqlca	file:
+sqlcincr	../src/scclib_db.c	/^   unsigned int   sqlcincr;$/;"	m	struct:sqlexd	file:
+sqlcmax	../src/scclib_db.c	/^   unsigned int   sqlcmax;$/;"	m	struct:sqlexd	file:
+sqlcmin	../src/scclib_db.c	/^   unsigned int   sqlcmin;$/;"	m	struct:sqlexd	file:
+sqlcnowait	../src/scclib_db.c	/^   unsigned int   sqlcnowait;$/;"	m	struct:sqlexd	file:
+sqlcode	../src/scclib_db.c	/^         \/* b4  *\/ int     sqlcode;$/;"	m	struct:sqlca	file:
+sqlctimeout	../src/scclib_db.c	/^   unsigned int   sqlctimeout;$/;"	m	struct:sqlexd	file:
+sqlctx	../src/scclib_db.c	/^static unsigned int sqlctx = 310987;$/;"	v	file:
+sqlcud0	../src/scclib_db.c	/^static const short sqlcud0[] =$/;"	v	file:
+sqlcxp	../src/scclib_db.c	/^struct sqlcxp$/;"	s	file:
+sqlerrd	../src/scclib_db.c	/^         \/* b4  *\/ int     sqlerrd[6];$/;"	m	struct:sqlca	file:
+sqlerrm	../src/scclib_db.c	/^           } sqlerrm;$/;"	m	struct:sqlca	typeref:struct:sqlca::__anon4	file:
+sqlerrm	../src/scclib_db.c	/^           } sqlerrm;$/;"	m	struct:sqlca	typeref:struct:sqlca::__anon5	file:
+sqlerrmc	../src/scclib_db.c	/^           \/* ub1 *\/ char           sqlerrmc[70];$/;"	m	struct:sqlca::__anon4	file:
+sqlerrmc	../src/scclib_db.c	/^           \/* ub1 *\/ char           sqlerrmc[70];$/;"	m	struct:sqlca::__anon5	file:
+sqlerrml	../src/scclib_db.c	/^           \/* ub2 *\/ unsigned short sqlerrml;$/;"	m	struct:sqlca::__anon4	file:
+sqlerrml	../src/scclib_db.c	/^           \/* ub2 *\/ unsigned short sqlerrml;$/;"	m	struct:sqlca::__anon5	file:
+sqlerrp	../src/scclib_db.c	/^         \/* ub1 *\/ char    sqlerrp[8];$/;"	m	struct:sqlca	file:
+sqlest	../src/scclib_db.c	/^   unsigned char  *sqlest;$/;"	m	struct:sqlexd	file:
+sqlety	../src/scclib_db.c	/^   unsigned short sqlety;$/;"	m	struct:sqlexd	file:
+sqlexd	../src/scclib_db.c	/^static struct sqlexd {$/;"	s	file:
+sqlext	../src/scclib_db.c	/^         \/* ub1 *\/ char    sqlext[8];$/;"	m	struct:sqlca	file:
+sqlfpn	../src/scclib_db.c	/^static const struct sqlcxp sqlfpn =$/;"	v	typeref:struct:sqlcxp	file:
+sqlstm	../src/scclib_db.c	/^} sqlstm = {12,4};$/;"	v	typeref:struct:sqlexd	file:
+sqltds	../src/scclib_db.c	/^static struct sqltdss sqltds =$/;"	v	typeref:struct:sqltdss	file:
+sqltdsp	../src/scclib_db.c	/^   sqltdss *sqltdsp;$/;"	m	struct:sqlexd	file:
+sqltdss	../src/scclib_db.c	/^struct sqltdss$/;"	s	file:
+sqltdss	../src/scclib_db.c	/^typedef struct sqltdss sqltdss;$/;"	t	typeref:struct:sqltdss	file:
+sqltvn	../src/scclib_db.c	/^struct sqltvn$/;"	s	file:
+sqltvn	../src/scclib_db.c	/^typedef struct sqltvn sqltvn;$/;"	t	typeref:struct:sqltvn	file:
+sqlvsn	../src/scclib_db.c	/^   unsigned long  sqlvsn;$/;"	m	struct:sqlexd	file:
+sqlwarn	../src/scclib_db.c	/^         \/* ub1 *\/ char    sqlwarn[8];$/;"	m	struct:sqlca	file:
+sqpadto	../src/scclib_db.c	/^   unsigned short  *sqpadto;$/;"	m	struct:sqlexd	file:
+sqparc	../src/scclib_db.c	/^   unsigned long  **sqparc;$/;"	m	struct:sqlexd	file:
+sqparm	../src/scclib_db.c	/^   unsigned long  *sqparm;$/;"	m	struct:sqlexd	file:
+sqphsl	../src/scclib_db.c	/^   unsigned long  *sqphsl;$/;"	m	struct:sqlexd	file:
+sqphss	../src/scclib_db.c	/^            int   *sqphss;$/;"	m	struct:sqlexd	file:
+sqphsv	../src/scclib_db.c	/^   unsigned char  **sqphsv;$/;"	m	struct:sqlexd	file:
+sqpind	../src/scclib_db.c	/^            short **sqpind;$/;"	m	struct:sqlexd	file:
+sqpins	../src/scclib_db.c	/^            int   *sqpins;$/;"	m	struct:sqlexd	file:
+sqptdso	../src/scclib_db.c	/^   unsigned short  *sqptdso;$/;"	m	struct:sqlexd	file:
+sqtdso	../src/scclib_db.c	/^   unsigned short  sqtdso[4];$/;"	m	struct:sqlexd	file:
+stmt	../src/scclib_db.c	/^      const char  *stmt;$/;"	m	struct:sqlexd	file:
+tdsnum	../src/scclib_db.c	/^  unsigned short tdsnum; $/;"	m	struct:sqltdss	file:
+tdsval	../src/scclib_db.c	/^  unsigned char *tdsval[1]; $/;"	m	struct:sqltdss	file:
+tdsvsn	../src/scclib_db.c	/^  unsigned int tdsvsn; $/;"	m	struct:sqltdss	file:
+tvnnm	../src/scclib_db.c	/^  unsigned char *tvnnm;$/;"	m	struct:sqltvn	file:
+tvnnml	../src/scclib_db.c	/^  unsigned short tvnnml; $/;"	m	struct:sqltvn	file:
+tvnsnm	../src/scclib_db.c	/^  unsigned char *tvnsnm;$/;"	m	struct:sqltvn	file:
+tvnsnml	../src/scclib_db.c	/^  unsigned short tvnsnml;$/;"	m	struct:sqltvn	file:
+tvnvsn	../src/scclib_db.c	/^  unsigned char *tvnvsn; $/;"	m	struct:sqltvn	file:
+tvnvsnl	../src/scclib_db.c	/^  unsigned short tvnvsnl; $/;"	m	struct:sqltvn	file:
+type	../src/scclib_db.h	/^	SccDbFieldType type;$/;"	m	struct:_SccDbField
+value	../src/scclib_db.h	/^	void *value;$/;"	m	struct:_SccDbField
+varchar	../src/scclib_db.c	/^typedef struct { unsigned short len; unsigned char arr[1]; } varchar;$/;"	t	typeref:struct:__anon3	file:

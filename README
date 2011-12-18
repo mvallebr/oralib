@@ -1,0 +1,61 @@
+This simple library was made in Oracle Pro*C (method 4) and 
+provides an API  to access (Create, Update, Delete, Select) 
+Oracle databases. 
+It's very simple to use and reminds a bit Java JDBC.
+
+You need Pro*C only to compile the library, not to compile the 
+programs that use the library. So, if you need to use Pro*C,
+you can just compile the lib using it and start using C for the 
+rest. To run you program, you need just Oracle OCI libraries
+available on the library path. 
+
+To use it, you simply create a handler to a connection to the 
+database and use it to prepare a statement. Once you have the 
+prepared statement, you can bind values to bind variables you 
+defined on it and execute it.
+
+In the case of a select statement, you can iterate over the 
+results using the fetch function, that sets the current record 
+to the next one, or returns that no more data exists.
+
+In the case of a create, update or delete statement, you can 
+commit or rollback after the execution. By default, the library 
+always perform a rollback when an error has occured and if you 
+finish the session without commiting the library auto performs
+the commit at finishing time.
+
+To see a full feature example, take a look on the test.c file. In 
+about 170 lines of code, you have a "sqlplus" like program written 
+in C.  
+
+THREADS:
+A note about threads: this library supports the use of multiple
+threads, but you should NOT use the same handler in more than one 
+thread at the same time. If you want to perform database operations
+in parallel, create several handlers and use a diferent one for 
+each thread. This can easilly be done by using a connection pool.
+
+COMPILING:
+A note about the makefile: the library was compiled in a HPUX 
+environment and the flags are set to generate a 64bits binary. You
+will probably need to adapt it 
+
+IMPORTANT LIMITATION:
+The library supports bind to several oracle internal types, like
+strings, dates, numbers, etc. However, I have not tested it with 
+LONG types, so I don't know if you can use it. You will probably 
+need to change a thing or other in the lib to be able to do it.
+
+More important, only float type is supported by now, I haven't tested 
+it using double. Also, the size of the number type is limited to the 
+biggest long type size to the platform you are using. For instance, if
+you compile the library on a 64bits enviroment, the biggest long type 
+size if c has 64 bits (8 bytes). Therefore, the maximum number you can 
+store in C has 19 bytes (1,844674407×10¹⁹) and you can only safely map
+fields in Oracle that are 18 bytes long. If you are using 32bits, you
+should safely map only to NUMBER(8) fields.
+
+As a final note, please let me know if you use this library. I would be 
+happy to know that someone else is benefit from using it.  
+   
+ 
